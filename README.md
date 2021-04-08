@@ -4,6 +4,6 @@ Monografia de Graduação apresentada ao Departamento de Estatística do Centro 
 
 Curvas características dos itens de Matemática referentes a prova do Exame de Seleção do IFRN:
 
-!()[https://github.com/ThiagoValentimMarques/tri-ifrn/blob/main/Fig25-1.png?raw=true]
+![](https://github.com/ThiagoValentimMarques/tri-ifrn/blob/main/Fig25-1.png?raw=true)
 
 
