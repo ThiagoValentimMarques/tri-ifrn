@@ -233,18 +233,14 @@ curve(1/(inf(x,3,0,0)+inf(x,2,0,0)+
         inf(x,3,1,0.2)+inf(x,0.9,-2,0))^(0.5),
       lwd=2,xlim=c(-4,4),add=TRUE,lty=2,col="red")
 
-### Figura 13 (Mapa do RN com os campi do IFRN)
-
 ##########################################################
 ##########################################################
 
 #--------- DADOS DO EXAME DE SELEÇÃO --------------------#
 
 library(readxl)
-exame <- read_excel("C:/Users/Thiago/Dropbox/Meu computador/Estatística UFRN - Disciplinas/Monografia - Template Marcus Nunes/Meu TCC - TRI no IFRN/Exame seleção 2020/dados_completos_exam_sel_2020_presentes.xlsx")
-#exame <- read_excel("exam_sel_2020_pre.xlsx")
-exame2<-read_excel("C:/Users/Thiago/Dropbox/Meu computador/Estatística UFRN - Disciplinas/Monografia - Template Marcus Nunes/Meu TCC - TRI no IFRN/Exame seleção 2020/dados_completos_exam_sel_2020.xlsx")
-#exame2 <- read_excel("exam_sel_2020.xlsx")
+exame <- read_excel("exam_sel_2020_pre.xlsx")
+exame2 <- read_excel("exam_sel_2020.xlsx")
 
 require(tidyverse) #Pacote tidyverse
 
@@ -299,19 +295,6 @@ theme(axis.title.y = element_text(size = rel(1.2), angle = 90,
       axis.text.y = element_text(angle = 90, hjust = 0.5, 
                                  size=14,color="black"))
 
-ggplot(exame,aes(x=escore_portugues))+
-  geom_boxplot(col = "red",fill="lightblue")+
-  xlab("Escores de Língua Portuguesa")+
-  coord_cartesian(xlim = c(100, 900))+ 
-  theme_light()+coord_flip()+
-  theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.title.y = element_text(size = rel(1.2), angle = 90,
-                                    vjust = 1.5),
-        axis.text.y = element_text(angle = 0, hjust = 0.5, 
-                                   size=14,color="black"))
-
 ### Figura 15
 
 ggplot(exame,aes(x=escore_matematica))+
@@ -331,25 +314,11 @@ ggplot(exame,aes(x=escore_matematica))+
         axis.text.y = element_text(angle = 90, hjust = 0.5, 
                                    size=14,color="black"))
 
-ggplot(exame,aes(x=escore_matematica))+
-  geom_boxplot(col = "red",fill="lightblue")+
-  xlab("Escores de Matemática")+
-  coord_cartesian(xlim = c(100, 900))+ 
-  theme_light()+coord_flip()+
-  theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.title.y = element_text(size = rel(1.2), angle = 90,
-                                    vjust = 1.5),
-        axis.text.y = element_text(angle = 0, hjust = 0.5, 
-                                   size=14,color="black"))
-
-
 #install.packages("moments")
 require(moments)
 
 skewness(exame$escore_matematica) #Assimetria positiva
-skewness(exame$escore_portugues) #Assimentria negativa
+skewness(exame$escore_portugues) #Assimetria negativa
 
 #Folhas de respostas na forma de matriz
 n=dim(exame)[1]
@@ -375,7 +344,6 @@ total<-matrix(NA,nrow=n,ncol=38)
 for(i in 1:n){
   total[i,]<-as.numeric(oficial[i,]==gabarito)
 }
-View(total)
 colnames(total)<-1:38
 
 #Proporção de acertos
@@ -435,7 +403,9 @@ data<-data.frame(matriz,questao,score)
 #Figura 18
 ggplot(data,aes(x=score,y=matriz))+geom_point()+
   facet_wrap(~questao)+coord_cartesian(ylim = c(0, 1))+
-  geom_smooth(se = FALSE)+xlab("Escore")+
+  geom_smooth(method = "glm", 
+              method.args = list(family = "binomial"), 
+              se = FALSE)+xlab("Escore")+
   ylab("Proporção de acertos nas questões de Língua Portuguesa")+
   theme_light()+
   theme(axis.title.x = element_text(size = rel(1.2), angle = 0,
@@ -471,7 +441,9 @@ data<-data.frame(matriz,questao,score)
 
 #Figura 19
 ggplot(data,aes(x=score,y=matriz))+geom_point()+
-  facet_wrap(~questao)+geom_smooth(se = FALSE)+
+  facet_wrap(~questao)+geom_smooth(method = "glm", 
+                                   method.args = list(family = "binomial"), 
+                                   se = FALSE)+
   coord_cartesian(ylim = c(0, 1))+ xlab("Escore")+
   ylab("Proporção de acertos nas questões de Matemática")+
   theme_light()+
@@ -490,7 +462,6 @@ ggplot(data,aes(x=score,y=matriz))+geom_point()+
 #################################################################
 
 require(ltm)
-require(mirt)
 require(xtable)
 
 ###################################
@@ -503,6 +474,10 @@ fit.port <- tpm(total[,1:19], IRT.param = TRUE,
 coef(fit.port)
 # Latent Trait Model
 #fit.port2 <- ltm(total[,1:19] ~ z1,IRT.param = TRUE)
+
+require(mirt)
+citation("ltm")
+citation("mirt")
 
 info<-NULL
 for(i in 1:19){
@@ -611,7 +586,7 @@ names(theta$score.dat)
 
 # Figura 23
 theta$score.dat%>%
-  ggplot(.,aes(x=z1))+geom_histogram(col="red",
+  ggplot(.,aes(x=z1))+geom_histogram(col="blue",fill="grey50",
                                  breaks=seq(-4, 4, by=0.25))+
   ylab("Frequência")+
   xlab(expression(paste("Traço Latente"," (",
@@ -804,7 +779,7 @@ theta$score.dat #Traços latentes estimados
 
 # Figura 29
 theta$score.dat%>%
-  ggplot(.,aes(x=z1))+geom_histogram(col="red",
+  ggplot(.,aes(x=z1))+geom_histogram(col="blue",fill="grey50",
                                      breaks=seq(-4, 4, by=0.25))+
   ylab("Frequência")+
   xlab(expression(paste("Traço Latente"," (",
@@ -920,6 +895,3 @@ tabela_final <- data.frame(pos[,c(3)],
 xtable(tabela_final[1:50,],digits = 0)
 
 table(as.numeric(as.character(pos$pos.tct[1:50]))>50)
-
-
-
